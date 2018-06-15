@@ -22,8 +22,17 @@ ClassExample::ClassExample(const Napi::CallbackInfo& info) : Napi::ObjectWrap<Cl
   Napi::HandleScope scope(env);
 
   int length = info.Length();
-  if (length != 1 || !info[0].IsNumber()) {
-    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+  
+  if (length != 1) {
+    Napi::TypeError::New(env, "Only one argument expected").ThrowAsJavaScriptException();
+  }
+
+  if(!info[0].IsNumber()){
+    Napi::Object object_parent = info[0].As<Napi::Object>();
+    ClassExample* example_parent = Napi::ObjectWrap<ClassExample>::Unwrap(object_parent);
+    ActualClass* parent_actual_class_instance = example_parent->GetInternalInstance();
+    this->actualClass_ = new ActualClass(parent_actual_class_instance->getValue());
+    return;
   }
 
   Napi::Number value = info[0].As<Napi::Number>();
@@ -51,4 +60,8 @@ Napi::Value ClassExample::Add(const Napi::CallbackInfo& info) {
   double answer = this->actualClass_->add(toAdd.DoubleValue());
 
   return Napi::Number::New(info.Env(), answer);
+}
+
+ActualClass* ClassExample::GetInternalInstance() {
+  return this->actualClass_;
 }

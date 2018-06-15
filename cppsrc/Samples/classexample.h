@@ -5,6 +5,7 @@ class ClassExample : public Napi::ObjectWrap<ClassExample> {
  public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   ClassExample(const Napi::CallbackInfo& info);
+  ActualClass* GetInternalInstance();
 
  private:
   static Napi::FunctionReference constructor;
